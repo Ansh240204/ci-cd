@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "my-app"
-        REGISTRY   = "anshraghu24"
+        REGISTRY = "anshraghu24"
     }
 
     stages {
@@ -44,11 +44,11 @@ pipeline {
                         variable: 'KUBECONFIG'
                     )
                 ]) {
-                    sh "tar -czf /tmp/app.tar.gz -C ${WORKSPACE} ."
+                    sh "tar -czf /tmp/app.tar.gz -C \${WORKSPACE} ."
                     sh "docker cp /tmp/app.tar.gz minikube:/tmp/app.tar.gz"
                     sh 'docker exec minikube sh -c "rm -rf /tmp/build && mkdir -p /tmp/build && tar -xzf /tmp/app.tar.gz -C /tmp/build"'
                     sh 'docker exec minikube docker build -t my-app:local /tmp/build'
-                    sh "kubectl apply -f ${WORKSPACE}/k8s-deployment.yaml"
+                    sh "kubectl apply -f \${WORKSPACE}/k8s-deployment.yaml"
                     sh "kubectl set image deployment/my-app my-app=my-app:local --namespace=default"
                     sh "kubectl rollout status deployment/my-app --namespace=default"
                 }
@@ -60,7 +60,6 @@ pipeline {
         success {
             echo 'Deployment successful!'
         }
-
         failure {
             echo 'Pipeline failed — check logs above.'
         }
