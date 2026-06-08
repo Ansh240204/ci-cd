@@ -44,7 +44,8 @@ pipeline {
                         variable: 'KUBECONFIG'
                     )
                 ]) {
-                    sh "docker cp /var/jenkins_home/workspace/my-app-pipeline minikube:/tmp/build"
+                    sh "docker exec minikube mkdir -p /tmp/build"
+                    sh "docker cp \${WORKSPACE}/. minikube:/tmp/build/"
                     sh "docker exec minikube docker build -t my-app:local /tmp/build"
                     sh "kubectl apply -f k8s-deployment.yaml"
                     sh "kubectl set image deployment/my-app my-app=my-app:local --namespace=default"
