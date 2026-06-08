@@ -11,7 +11,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/Ansh240204/ci-cd'
+                    url: 'https://github.com/Ansh240204/ci-cd.git'
             }
         }
 
@@ -30,13 +30,8 @@ pipeline {
                         passwordVariable: 'DOCKER_PASS'
                     )
                 ]) {
-                    sh '''
-                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                    '''
-
-                    sh """
-                        docker push ${REGISTRY}/${IMAGE_NAME}:${BUILD_NUMBER}
-                    """
+                    sh "echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin"
+                    sh "docker push ${REGISTRY}/${IMAGE_NAME}:${BUILD_NUMBER}"
                 }
             }
         }
@@ -49,17 +44,11 @@ pipeline {
                         variable: 'KUBECONFIG'
                     )
                 ]) {
-
-                    sh """
-                        kubectl set image deployment/${IMAGE_NAME} \
-                        ${IMAGE_NAME}=${REGISTRY}/${IMAGE_NAME}:${BUILD_NUMBER} \
-                        --namespace=default
-                    """
-
-                    sh """
-                        kubectl rollout status deployment/${IMAGE_NAME} \
-                        --namespace=default
-                    """
+                    sh "docker cp /var/jenkins_home/workspace/my-app-pipeline minikube:/tmp/build"
+                    sh "docker exec minikube docker build -t my-app:local /tmp/build"
+                    sh "kubectl apply -f k8s-deployment.yaml"
+                    sh "kubectl set image deployment/my-app my-app=my-app:local --namespace=default"
+                    sh "kubectl rollout status deployment/my-app --namespace=default"
                 }
             }
         }
