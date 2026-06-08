@@ -1,1 +1,1 @@
-print("Hello from my app")
+print("Hello from my app - v2")
