@@ -2,10 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: my-app
-  namespace: default
 
 spec:
   replicas: 1
+
   selector:
     matchLabels:
       app: my-app
@@ -17,6 +17,9 @@ spec:
 
     spec:
       containers:
-        - name: my-app
-          image: my-app:local
-          imagePullPolicy: Never
+      - name: my-app
+        image: anshraghu24/my-app:latest
+        imagePullPolicy: Always
+
+        ports:
+        - containerPort: 8080
