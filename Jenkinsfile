@@ -43,12 +43,20 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                withKubeConfig([credentialsId: 'kubeconfig-creds']) {
+                withCredentials([
+                    file(
+                        credentialsId: 'kubeconfig-creds',
+                        variable: 'KUBECONFIG'
+                    )
+                ]) {
+
                     sh """
                         kubectl set image deployment/${IMAGE_NAME} \
                         ${IMAGE_NAME}=${REGISTRY}/${IMAGE_NAME}:${BUILD_NUMBER} \
                         --namespace=default
+                    """
 
+                    sh """
                         kubectl rollout status deployment/${IMAGE_NAME} \
                         --namespace=default
                     """
