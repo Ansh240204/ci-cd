@@ -1,3 +1,3 @@
 #!/bin/sh
 
-echo "hello from my-app - v4"
+echo "hello from my-app - v5"
